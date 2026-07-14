@@ -4,21 +4,21 @@ from models.account import Account
 from models.transaction import Transaction
 
 bank = Bank()
-luis = User("Luis", "luis@gmail.com")
-bank.add_user(luis)
+luis = bank.create_user("Luis", "luis@gmail.com")
+saving = bank.open_account(luis, "saving", 1000)
 
-checking = Account('Checking', 1000)
-luis.add_account(checking)
+juan = bank.create_user("Juan", "juan@gmail.com")
+checking = bank.open_account(juan, "checking", 500)
 
-print(bank.users[0].name)
-print(bank.users[0].email)
-print(bank.users[0].accounts[0].account_type)
-print(bank.users[0].accounts[0].balance)
+print(luis.name)
+print(luis.email)
+print(luis.accounts[0].account_type)
+print(luis.accounts[0].account_number)
+print(luis.accounts[0].balance)
 
-checking.deposit(500) 
+print("-----")
 
-# checking.withdraw(1990)
-checking.withdraw(800)
+bank.transaction(saving.account_number, checking.account_number, 100)
+bank.get_history(saving.account_number)
 
-# transaction = Transaction()
-# print(transaction[0])
+
