@@ -1,8 +1,14 @@
 import random
 from models.user import User
-from models.account import Account
+from models.account import Account, CheckingAccount, CreditAccount, SavingAccount
 
-class Bank: 
+class Bank:
+    ACCOUNT_TYPES = {
+        "saving": SavingAccount,
+        "checking": CheckingAccount, 
+        "credit": CreditAccount
+    }
+ 
     def __init__ (self):
         self.users = []
         self.accounts = {}
@@ -13,9 +19,12 @@ class Bank:
         return user
     
     def open_account(self, user, account_type, balance):
-        account_number = self.gen_account_number()
+        account_class = self.ACCOUNT_TYPES.get(account_type.lower())
+        if account_class is None:
+            raise ValueError(f"Invalid account type: {account_type}. Valid types are: {', '.join(self.ACCOUNT_TYPES.keys())}")
 
-        account = Account(account_type, account_number, balance)
+        account_number = self.gen_account_number()
+        account = account_class(account_number, balance)
 
         self.accounts[account_number] = account
         user.add_account(account)
@@ -63,5 +72,5 @@ class Bank:
         if account is None: 
             print("Account does not exist.")
             return
-        # account.print_transaction_history()
+
         account.show_history(account_number)
