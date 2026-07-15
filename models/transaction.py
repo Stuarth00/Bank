@@ -18,14 +18,27 @@ class Transaction:
         self.date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     def __str__(self):
-        return f"""
+        if self.account_type == "credit":   
+            return f"""
             ----- RECEIPT -----
             Type: {self.transaction_type}
             From Account: {self.from_account_number}
             To Account: {self.to_account_number}
             Amount: ${self.amount}
             Account: {self.account_type}
-            Balance: ${self.balance}
+            Outstanding credit: ${self.balance}
             Date: {self.date}
             -------------------
         """
+        else:
+            return f"""
+                ----- RECEIPT -----
+                Type: {self.transaction_type}
+                From Account: {self.from_account_number}
+                To Account: {self.to_account_number}
+                Amount: ${self.amount}
+                Account: {self.account_type}
+                Balance: ${self.balance}
+                Date: {self.date}
+                -------------------
+            """

@@ -1,3 +1,4 @@
+from models.exceptions import InsufficientFundsError
 from models.transaction import Transaction
 
 class Account:
@@ -80,10 +81,13 @@ class CheckingAccount(Account):
 
 class CreditAccount(Account):
     account_type = "credit"
-    CREDIT_LIMIT = 2000;
+
+    def __init__(self, account_number, credit_limit):
+        super().__init__(account_number, 0)  
+        self.credit_limit = credit_limit
 
     def withdraw(self, amount, from_account_number=None, to_account_number=None):
-        if amount > self.CREDIT_LIMIT - self.balance:
+        if amount > self.credit_limit - self.balance:
             raise InsufficientFundsError("Exceeds credit limit.")
         self.balance += amount
         transaction = Transaction(

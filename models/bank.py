@@ -18,13 +18,13 @@ class Bank:
         self.users.append(user)
         return user
     
-    def open_account(self, user, account_type, balance):
+    def open_account(self, user, account_type, **kwargs):
         account_class = self.ACCOUNT_TYPES.get(account_type.lower())
         if account_class is None:
             raise ValueError(f"Invalid account type: {account_type}. Valid types are: {', '.join(self.ACCOUNT_TYPES.keys())}")
 
         account_number = self.gen_account_number()
-        account = account_class(account_number, balance)
+        account = account_class(account_number, **kwargs)
 
         self.accounts[account_number] = account
         user.add_account(account)
@@ -42,8 +42,14 @@ class Bank:
         return account_number
     
     def get_account(self, account_number):
-        print(f"Account found: {account_number}, Balance: ${self.accounts[account_number].balance}, Type: {self.accounts[account_number].account_type}, and owner: {[user.name for user in self.users if self.accounts[account_number] in user.accounts]}")
-        return self.accounts.get(account_number)
+        if account_number not in self.accounts:
+            print(f"Account {account_number} does not exist.")
+            return None
+        elif self.accounts[account_number].account_type == "credit":
+            print(f"Account found: {account_number}, Credit Limit: ${self.accounts[account_number].credit_limit}, Type: {self.accounts[account_number].account_type}, owner: {[user.name for user in self.users if self.accounts[account_number] in user.accounts]}")
+        else:
+            print(f"Account found: {account_number}, Balance: ${self.accounts[account_number].balance}, Type: {self.accounts[account_number].account_type}, owner: {[user.name for user in self.users if self.accounts[account_number] in user.accounts]}")
+            return self.accounts.get(account_number)
     
     def get_user(self, email):
         for user in self.users:
