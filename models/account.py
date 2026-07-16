@@ -1,4 +1,4 @@
-from models.exceptions import InsufficientFundsError
+from models.exceptions import InsufficientFundsError, InvalidAmountError
 from models.transaction import Transaction
 
 class Account:
@@ -10,46 +10,44 @@ class Account:
         self.transactions = []
 
     def deposit(self, amount, from_account_number=None, to_account_number=None):
+        if amount <= 0:
+            raise InvalidAmountError(f"Invalid deposit amount: {amount}. Amount must be greater than zero.") 
+        
         self.balance += amount
-
-        transaction = Transaction(
-            "deposit", 
-            from_account_number,
-            to_account_number,
-            amount, 
-            self.balance,
-            self.account_type
-        )
-        self.transactions.append(transaction)
-        return transaction
+        return self._record_transaction("deposit", amount, from_account_number, to_account_number)
 
     def withdraw(self, amount, from_account_number=None, to_account_number=None):
+        if amount <= 0:
+            raise InvalidAmountError(f"Invalid withdrawal amount: {amount}. Amount must be greater than zero.") 
+        
         if amount > self.balance:
             raise InsufficientFundsError(
                 f"Insufficient funds: balance {self.balance}, requested {amount}"
             )
 
         self.balance -= amount
+        self._record_transaction("withdraw", amount, from_account_number, to_account_number)
+    
+    def show_history(self): 
+        if not self.transactions: 
+            print(f"No transactions found for account {self.account_number}.")
+            return
+        
+        print(f"Transaction history for account {self.account_number}:")
+        for transaction in self.transactions:
+            print(transaction)
 
+    def _record_transaction(self, transaction_type, amount, from_account_number, to_account_number):
         transaction = Transaction(
-            "withdraw", 
-            from_account_number,
-            to_account_number,
+            transaction_type, 
+            from_account_number, 
+            to_account_number, 
             amount, 
-            self.balance,
+            self.balance, 
             self.account_type
         )
         self.transactions.append(transaction)
         return transaction
-    
-    def show_history(self, account_number): 
-        if not self.transactions: 
-            print(f"No transactions found for account {account_number}.")
-            return
-        
-        print(f"Transaction history for account {account_number}:")
-        for transaction in self.transactions:
-            print(transaction)
 
 class SavingAccount(Account):
     account_type = "saving"
@@ -58,7 +56,7 @@ class SavingAccount(Account):
     def withdraw(self, amount, from_account_number=None, to_account_number=None):
         if len([t for t in self.transactions if t.transaction_type == "withdraw"]) >= self.WITHDRAWAL_LIMIT:
             raise Exception(f"Withdrawal limit of {self.WITHDRAWAL_LIMIT} reached for account {self.account_number}.")
-        return super().withdraw(amount, from_account_number, to_account_number)
+        return self._record_transaction("withdraw", amount, from_account_number, to_account_number)
 
 class CheckingAccount(Account):
     account_type = "checking"
@@ -68,16 +66,7 @@ class CheckingAccount(Account):
         if amount > self.balance + self.OVERDRAFT_LIMIT:
             raise InsufficientFundsError("Exceeds overdraft limit.")
         self.balance -= amount
-        transaction = Transaction(
-            "withdraw", 
-            from_account_number,
-            to_account_number,
-            amount, 
-            self.balance,
-            self.account_type
-        )
-        self.transactions.append(transaction)
-        return transaction
+        return self._record_transaction("withdraw", amount, from_account_number, to_account_number)
 
 class CreditAccount(Account):
     account_type = "credit"
@@ -90,13 +79,4 @@ class CreditAccount(Account):
         if amount > self.credit_limit - self.balance:
             raise InsufficientFundsError("Exceeds credit limit.")
         self.balance += amount
-        transaction = Transaction(
-            "withdraw", 
-            from_account_number,
-            to_account_number,
-            amount, 
-            self.balance,
-            self.account_type
-        )
-        self.transactions.append(transaction)
-        return transaction
+        return self._record_transaction("withdraw", amount, from_account_number, to_account_number)

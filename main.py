@@ -21,7 +21,9 @@ print("-----")
 
 bank.get_account(credit.account_number)
 bank.get_account(saving.account_number)
-bank.get_account(checking.account_number)
 
-bank.transaction(credit.account_number, checking.account_number, 100)
+bank.transaction(checking.account_number, saving.account_number, 1000)
 bank.get_history(credit.account_number)
+
+# bank.close_account(saving.account_number)
+bank.close_user("juan@gmail.com")

@@ -6,3 +6,6 @@ class AccountNotFoundError(Exception):
 
 class InvalidAmountError(Exception):
     pass
+
+class BalanceNotZeroError(Exception):
+    pass

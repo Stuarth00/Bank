@@ -32,13 +32,13 @@ class Transaction:
         """
         else:
             return f"""
-                ----- RECEIPT -----
-                Type: {self.transaction_type}
-                From Account: {self.from_account_number}
-                To Account: {self.to_account_number}
-                Amount: ${self.amount}
-                Account: {self.account_type}
-                Balance: ${self.balance}
-                Date: {self.date}
-                -------------------
+            ----- RECEIPT -----
+            Type: {self.transaction_type}
+            From Account: {self.from_account_number}
+            To Account: {self.to_account_number}
+            Amount: ${self.amount}
+            Account: {self.account_type}
+            Balance: ${self.balance}
+            Date: {self.date}
+            -------------------
             """
